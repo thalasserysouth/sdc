@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>അംഗത്വം, പങ്കാളിത്തം & ഹാജർ രജിസ്റ്റർ</title>
+<style>
+:root{--navy:#17365d;--blue:#2463a6;--teal:#087e78;--bg:#f3f6fa;--line:#dce4ee;--ink:#1d2939;--muted:#667085;--red:#b42318}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans Malayalam","Kartika","Arial",sans-serif;font-size:16px}
+header{background:linear-gradient(120deg,#17365d,#2463a6);color:white;padding:22px 16px;text-align:center}header h1{margin:0;font-size:clamp(22px,4vw,32px)}header p{margin:8px 0 0;opacity:.9}
+nav{display:flex;gap:8px;overflow:auto;padding:12px;background:#fff;position:sticky;top:0;z-index:5;box-shadow:0 2px 8px #152b4815}
+nav button{white-space:nowrap;border:0;border-radius:9px;padding:11px 15px;background:#eaf0f7;color:var(--navy);font-weight:700;cursor:pointer;font:inherit}
+nav button.active{background:var(--navy);color:#fff}
+main{max-width:1200px;margin:20px auto;padding:0 14px}.panel{display:none}.panel.active{display:block}
+.card{background:white;border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 3px 12px #17365d0a}
+h2{color:var(--navy);font-size:22px;margin:0 0 15px}h3{font-size:18px;margin:0 0 12px;color:var(--navy)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+label{display:block;font-weight:700;margin-bottom:5px;font-size:14px}input,select,textarea{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:8px;font:inherit;background:white;color:var(--ink)}textarea{min-height:75px}
+button.action{border:0;border-radius:8px;padding:11px 16px;background:var(--blue);color:white;font:inherit;font-weight:700;cursor:pointer;margin:5px 4px 0 0}
+button.green{background:var(--teal)}button.gray{background:#475467}button.danger{background:var(--red)}button.light{background:#eaf0f7;color:var(--navy)}
+.small{font-size:13px;color:var(--muted)}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}.stat{background:#f2f7fc;border-radius:10px;padding:16px}.stat b{display:block;font-size:27px;color:var(--navy)}
+table{width:100%;border-collapse:collapse;margin-top:12px;font-size:14px}th,td{border-bottom:1px solid var(--line);padding:10px;text-align:left;vertical-align:top}th{background:#edf3f9;color:var(--navy)}.table-wrap{overflow:auto}
+.notice{padding:12px;border-radius:9px;background:#fff8e6;color:#805b00;margin:10px 0}.hidden{display:none!important}.inline{display:flex;gap:10px;align-items:end;flex-wrap:wrap}.inline>div{flex:1;min-width:180px}.checkline{display:flex;gap:8px;align-items:center}.checkline input{width:auto}
+.bulk-table{max-height:420px;overflow:auto;border:1px solid var(--line);border-radius:10px;margin-top:10px}
+.bulk-table table{margin-top:0}.bulk-table th{position:sticky;top:0;z-index:2}
+.bulk-table td{padding:7px 10px}.bulk-table select{padding:7px;min-width:120px}
+.bulk-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.bulk-toolbar input{flex:1;min-width:180px}
+.member-summary{background:#f8fbff;border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px}
+.member-summary h3{margin:0 0 8px}
+.member-summary .tag{display:inline-block;background:#eaf0f7;color:var(--navy);border-radius:20px;padding:4px 12px;margin:3px 6px 3px 0;font-size:13px;font-weight:700}
+.member-summary .tag.office{background:#e6f6f4;color:var(--teal)}
+.event-count{font-size:13px;color:var(--muted);margin-top:6px}
+@media print{body{background:#fff;font-size:12px}header,nav,.no-print,.action{display:none!important}main{max-width:none;margin:0;padding:0}.panel{display:none!important}.panel.printing{display:block!important}.card{box-shadow:none;border:0;padding:0}.report-title{display:block!important}table{font-size:11px}th,td{padding:6px}.member-summary{page-break-inside:avoid}}
+</style>
+</head>
+<body>
+<header><h1>അംഗത്വം, പരിപാടി പങ്കാളിത്തം & യോഗ ഹാജർ രജിസ്റ്റർ</h1><p>അംഗങ്ങളുടെ വിവരങ്ങൾ • പരിപാടികളിലെ പങ്കാളിത്തം • യോഗ ഹാജർ</p></header>
+<nav class="no-print">
+<button class="active" data-tab="home">ഡാഷ്ബോർഡ്</button>
+<button data-tab="members">അംഗങ്ങൾ</button>
+<button data-tab="participation">പരിപാടി പങ്കാളിത്തം</button>
+<button data-tab="attendance">യോഗ ഹാജർ</button>
+<button data-tab="reports">റിപ്പോർട്ടുകൾ</button>
+<button data-tab="backup">ബാക്കപ്പ്</button>
+</nav>
+<main>
+<section id="home" class="panel active">
+<div class="card"><h2>ഡാഷ്ബോർഡ്</h2><div class="stats">
+<div class="stat"><span>ആകെ അംഗങ്ങൾ</span><b id="countAll">0</b></div>
+<div class="stat"><span>ഭാരവാഹികൾ</span><b id="countOffice">0</b></div>
+<div class="stat"><span>പരിപാടി പങ്കാളിത്തങ്ങൾ</span><b id="countPart">0</b></div>
+<div class="stat"><span>യോഗ ഹാജർ രേഖകൾ</span><b id="countMeet">0</b></div>
+</div></div>
+<div class="card"><h3>ആരംഭിക്കാൻ</h3><p>ആദ്യം അംഗങ്ങളുടെ വിവരങ്ങൾ ചേർക്കുക. ഒരുമിച്ച് നിരവധി അംഗങ്ങളെ CSV ഫയൽ വഴി അപ്‌ലോഡ് ചെയ്യാനും കഴിയും. തുടർന്ന് പരിപാടി പങ്കാളിത്തവും യോഗ ഹാജറും രേഖപ്പെടുത്താം. "എല്ലാ അംഗങ്ങൾക്കും ഒന്നിച്ച്" എന്ന ബൾക്ക് ഫോം ഉപയോഗിച്ച് ഒരു യോഗത്തിനോ പരിപാടിക്കോ എല്ലാവരുടെയും ഹാജർ/പങ്കാളിത്തം ഒറ്റയടിക്ക് രേഖപ്പെടുത്താം. റിപ്പോർട്ട് പാനലിൽ "അംഗം തിരിച്ചുള്ള പരിപാടി പങ്കാളിത്തം" തിരഞ്ഞെടുത്ത് ഓരോ അംഗവും ഏതൊക്കെ പരിപാടികളിൽ പങ്കെടുത്തു എന്ന് കാണാം.</p></div>
+</section>
+<section id="members" class="panel">
+<div class="card"><h2>അംഗങ്ങളുടെ വിവരങ്ങൾ</h2>
+<form id="memberForm"><input type="hidden" id="editId"><div class="grid">
+<div><label>അംഗത്തിന്റെ പേര് *</label><input id="mName" required></div>
+<div><label>മൊബൈൽ നമ്പർ</label><input id="mPhone" inputmode="tel"></div>
+<div><label>അംഗത്വ നമ്പർ</label><input id="mNo"></div>
+<div><label>അംഗത്തിന്റെ വിഭാഗം *</label><select id="mType"><option value="member">അംഗം</option><option value="office">ഭാരവാഹി</option></select></div>
+<div><label>പദവി (ഭാരവാഹിയാണെങ്കിൽ)</label><input id="mRole" placeholder="ഉദാ: പ്രസിഡന്റ്, സെക്രട്ടറി"></div>
+<div><label>വിലാസം / യൂണിറ്റ്</label><input id="mAddress"></div>
+</div><button class="action green" type="submit">അംഗത്തെ സേവ് ചെയ്യുക</button><button class="action light" type="button" onclick="resetMember()">പുതിയത് / റദ്ദാക്കുക</button></form></div>
+<div class="card"><h3>അംഗങ്ങളെ ബൾക്കായി അപ്‌ലോഡ് ചെയ്യുക</h3><p class="small">CSV ഫയലിന്റെ ആദ്യ വരിയിൽ ഈ തലക്കെട്ടുകൾ നൽകുക: പേര്, മൊബൈൽ, അംഗത്വനമ്പർ, വിഭാഗം, പദവി, വിലാസം. വിഭാഗം: അംഗം അല്ലെങ്കിൽ ഭാരവാഹി. Excel-ൽ നിന്ന് CSV UTF-8 ആയി സേവ് ചെയ്യുക.</p>
+<input type="file" id="csvFile" accept=".csv,text/csv"><button class="action" onclick="importCSV()">CSV അപ്‌ലോഡ് ചെയ്യുക</button><button class="action light" onclick="downloadTemplate()">CSV മാതൃക ഡൗൺലോഡ്</button><div id="importMsg" class="small"></div></div>
+<div class="card"><div class="inline"><div><h3>അംഗങ്ങളുടെ പട്ടിക</h3></div><div><label>തിരയുക</label><input id="memberSearch" placeholder="പേര് / നമ്പർ / മൊബൈൽ" oninput="renderMembers()"></div><div><label>വിഭാഗം</label><select id="memberFilter" onchange="renderMembers()"><option value="all">എല്ലാവരും</option><option value="member">അംഗങ്ങൾ</option><option value="office">ഭാരവാഹികൾ</option></select></div></div>
+<div class="table-wrap"><table><thead><tr><th>ക്രമം</th><th>പേര്</th><th>അംഗത്വ നമ്പർ</th><th>മൊബൈൽ</th><th>വിഭാഗം / പദവി</th><th>വിലാസം</th><th class="no-print">നടപടി</th></tr></thead><tbody id="memberRows"></tbody></table></div></div>
+</section>
+<section id="participation" class="panel">
+<div class="card"><h2>പരിപാടി പങ്കാളിത്തം രേഖപ്പെടുത്തുക</h2><form id="partForm"><div class="grid">
+<div><label>പരിപാടിയുടെ പേര് *</label><input id="pEvent" required></div><div><label>തീയതി *</label><input id="pDate" type="date" required></div>
+<div><label>പങ്കെടുത്ത അംഗം *</label><select id="pMember" required></select></div><div><label>പങ്കാളിത്തത്തിന്റെ വിശദാംശം</label><input id="pDetail" placeholder="ഉദാ: മത്സര ഇനം, ചുമതല"></div>
+</div><button class="action green">പങ്കാളിത്തം സേവ് ചെയ്യുക</button></form></div>
+
+<div class="card">
+<h3>എല്ലാ അംഗങ്ങളുടെയും പങ്കാളിത്തം ഒന്നിച്ച് രേഖപ്പെടുത്തുക</h3>
+<div class="grid">
+<div><label>പരിപാടിയുടെ പേര് *</label><input id="bpEvent" required></div>
+<div><label>തീയതി *</label><input id="bpDate" type="date" required></div>
+</div>
+<div class="bulk-toolbar">
+<button class="action light" type="button" onclick="bulkSelectAll('part',true)">എല്ലാവരെയും തിരഞ്ഞെടുക്കുക</button>
+<button class="action light" type="button" onclick="bulkSelectAll('part',false)">എല്ലാം ഒഴിവാക്കുക</button>
+<input id="bpDetail" placeholder="എല്ലാവർക്കും ബാധകമായ വിശദാംശം (ഐച്ഛികം)">
+</div>
+<div class="bulk-table">
+<table><thead><tr><th>തിരഞ്ഞെടുക്കുക</th><th>പേര്</th><th>അംഗത്വ നമ്പർ</th><th>വിഭാഗം</th></tr></thead>
+<tbody id="bulkPartRows"></tbody></table>
+</div>
+<button class="action green" type="button" onclick="saveBulkPart()">തിരഞ്ഞെടുത്തവരുടെ പങ്കാളിത്തം സേവ് ചെയ്യുക</button>
+<div id="bulkPartMsg" class="small"></div>
+</div>
+
+<div class="card"><h3>പങ്കാളിത്ത രേഖകൾ</h3><div class="inline"><div><label>പരിപാടി</label><input id="pSearch" oninput="renderParts()" placeholder="പരിപാടിയുടെ പേര്"></div><div><label>തീയതി</label><input id="pDateFilter" type="date" oninput="renderParts()"></div></div><div class="table-wrap"><table><thead><tr><th>തീയതി</th><th>പരിപാടി</th><th>അംഗം</th><th>വിശദാംശം</th><th class="no-print">നടപടി</th></tr></thead><tbody id="partRows"></tbody></table></div></div>
+</section>
+<section id="attendance" class="panel">
+<div class="card"><h2>യോഗ ഹാജർ രേഖപ്പെടുത്തുക</h2><form id="meetingForm"><div class="grid">
+<div><label>യോഗത്തിന്റെ പേര് *</label><input id="aMeeting" required></div><div><label>യോഗ തീയതി *</label><input id="aDate" type="date" required></div>
+<div><label>ഹാജർ രേഖപ്പെടുത്തേണ്ട അംഗം *</label><select id="aMember" required></select></div><div><label>ഹാജർ നില</label><select id="aStatus"><option value="present">ഹാജർ</option><option value="absent">ഹാജരായില്ല</option><option value="leave">അവധി</option></select></div>
+<div><label>കുറിപ്പ്</label><input id="aNote"></div></div><button class="action green">ഹാജർ സേവ് ചെയ്യുക</button></form></div>
+
+<div class="card">
+<h3>എല്ലാ അംഗങ്ങളുടെയും ഹാജർ ഒന്നിച്ച് രേഖപ്പെടുത്തുക</h3>
+<div class="grid">
+<div><label>യോഗത്തിന്റെ പേര് *</label><input id="baMeeting" required></div>
+<div><label>യോഗ തീയതി *</label><input id="baDate" type="date" required></div>
+<div><label>എല്ലാവർക്കും ബാധകമായ ഹാജർ നില</label>
+<select id="baDefaultStatus">
+<option value="present">ഹാജർ</option>
+<option value="absent">ഹാജരായില്ല</option>
+<option value="leave">അവധി</option>
+</select>
+</div>
+</div>
+<div class="bulk-toolbar">
+<button class="action light" type="button" onclick="bulkSelectAll('att',true)">എല്ലാവരെയും തിരഞ്ഞെടുക്കുക</button>
+<button class="action light" type="button" onclick="bulkSelectAll('att',false)">എല്ലാം ഒഴിവാക്കുക</button>
+<input id="baNote" placeholder="എല്ലാവർക്കും ബാധകമായ കുറിപ്പ് (ഐച്ഛികം)">
+</div>
+<div class="bulk-table">
+<table><thead><tr><th>തിരഞ്ഞെടുക്കുക</th><th>പേര്</th><th>അംഗത്വ നമ്പർ</th><th>ഹാജർ നില</th></tr></thead>
+<tbody id="bulkAttRows"></tbody></table>
+</div>
+<button class="action green" type="button" onclick="saveBulkAtt()">തിരഞ്ഞെടുത്തവരുടെ ഹാജർ സേവ് ചെയ്യുക</button>
+<div id="bulkAttMsg" class="small"></div>
+</div>
+
+<div class="card"><h3>യോഗ ഹാജർ രേഖകൾ</h3><div class="inline"><div><label>യോഗം</label><input id="aSearch" oninput="renderAttendance()"></div><div><label>തീയതി</label><input id="aDateFilter" type="date" oninput="renderAttendance()"></div></div><div class="table-wrap"><table><thead><tr><th>തീയതി</th><th>യോഗം</th><th>അംഗം</th><th>ഹാജർ നില</th><th>കുറിപ്പ്</th><th class="no-print">നടപടി</th></tr></thead><tbody id="attendanceRows"></tbody></table></div></div>
+</section>
+<section id="reports" class="panel">
+<div class="card"><h2>റിപ്പോർട്ടുകൾ</h2><div class="grid">
+<div><label>റിപ്പോർട്ടിന്റെ തരം</label><select id="reportType" onchange="toggleReportOptions()">
+<option value="part">പരിപാടി പങ്കാളിത്ത റിപ്പോർട്ട്</option>
+<option value="attendance">യോഗ ഹാജർ റിപ്പോർട്ട്</option>
+<option value="members">അംഗങ്ങളുടെ പട്ടിക</option>
+<option value="memberpart">അംഗം തിരിച്ചുള്ള പരിപാടി പങ്കാളിത്തം</option>
+</select></div>
+<div><label>ആരംഭ തീയതി</label><input type="date" id="fromDate"></div><div><label>അവസാന തീയതി</label><input type="date" id="toDate"></div>
+<div><label>പരിപാടി / യോഗത്തിന്റെ പേര് (ഐച്ഛികം)</label><input id="reportName" placeholder="പേര് നൽകാതെ എല്ലാം കാണാം"></div>
+</div>
+<div class="grid" id="memberPickWrap" style="margin-top:12px;display:none">
+<div><label>അംഗം (ഐച്ഛികം — ഒരാളെ മാത്രം കാണാൻ)</label><select id="reportMember"><option value="">എല്ലാ അംഗങ്ങളും</option></select></div>
+</div>
+<button class="action" onclick="makeReport()">റിപ്പോർട്ട് തയ്യാറാക്കുക</button><button class="action green" onclick="printReport()">പ്രിന്റ് / PDF ആയി സേവ് ചെയ്യുക</button><div id="reportOutput"></div></div>
+</section>
+<section id="backup" class="panel">
+<div class="card"><h2>ബാക്കപ്പ് & ഡാറ്റ സംരക്ഷണം</h2><p>ഈ ആപ്പിലെ വിവരങ്ങൾ ഇപ്പോൾ ഉപയോഗിക്കുന്ന ബ്രൗസറിലെ ഉപകരണത്തിൽ മാത്രമാണ് സൂക്ഷിക്കുന്നത്. മറ്റൊരു ഫോണിലോ കമ്പ്യൂട്ടറിലോ സ്വയം ലഭിക്കില്ല.</p><button class="action green" onclick="exportBackup()">ബാക്കപ്പ് ഡൗൺലോഡ് ചെയ്യുക</button><div style="margin-top:14px"><label>ബാക്കപ്പ് JSON ഫയൽ പുനഃസ്ഥാപിക്കുക</label><input type="file" id="backupFile" accept=".json,application/json"><button class="action" onclick="restoreBackup()">ബാക്കപ്പ് പുനഃസ്ഥാപിക്കുക</button></div><div class="notice">ശ്രദ്ധിക്കുക: പുനഃസ്ഥാപിക്കുമ്പോൾ നിലവിലെ ഡാറ്റ ബാക്കപ്പ് ഫയലിലെ ഡാറ്റ ഉപയോഗിച്ച് മാറ്റിസ്ഥാപിക്കും. ആദ്യം നിലവിലെ ബാക്കപ്പ് എടുക്കുക.</div></div>
+</section>
+</main>
+<script>
+const KEY='member_program_attendance_ml_v1';
+let db={members:[],participations:[],attendance:[]};
+const $=id=>document.getElementById(id);
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+function load(){try{const d=JSON.parse(localStorage.getItem(KEY));if(d)db={...db,...d}}catch(e){}}
+function save(){localStorage.setItem(KEY,JSON.stringify(db));refresh()}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function memberName(id){return db.members.find(m=>m.id===id)?.name||'നീക്കം ചെയ്ത അംഗം'}
+function refresh(){renderMembers();renderParts();renderAttendance();renderBulkTables();fillSelects();$('countAll').textContent=db.members.length;$('countOffice').textContent=db.members.filter(m=>m.type==='office').length;$('countPart').textContent=db.participations.length;$('countMeet').textContent=db.attendance.length}
+function fillSelects(){['pMember','aMember'].forEach(id=>{const old=$(id).value;$(id).innerHTML='<option value="">അംഗത്തെ തിരഞ്ഞെടുക്കുക</option>'+db.members.slice().sort((a,b)=>a.name.localeCompare(b.name,'ml')).map(m=>`<option value="${esc(m.id)}">${esc(m.name)}${m.type==='office'?' (ഭാരവാഹി)':''}</option>`).join('');if(db.members.some(m=>m.id===old))$(id).value=old})}
+function resetMember(){$('memberForm').reset();$('editId').value=''}
+$('memberForm').addEventListener('submit',e=>{e.preventDefault();const id=$('editId').value;const m={id:id||uid(),name:$('mName').value.trim(),phone:$('mPhone').value.trim(),number:$('mNo').value.trim(),type:$('mType').value,role:$('mRole').value.trim(),address:$('mAddress').value.trim()};if(id)db.members=db.members.map(x=>x.id===id?m:x);else db.members.push(m);resetMember();save()});
+function renderMembers(){const q=$('memberSearch').value.toLowerCase(),f=$('memberFilter').value;const arr=db.members.filter(m=>(f==='all'||m.type===f)&&[m.name,m.phone,m.number,m.role,m.address].join(' ').toLowerCase().includes(q));$('memberRows').innerHTML=arr.map((m,i)=>`<tr><td>${i+1}</td><td>${esc(m.name)}</td><td>${esc(m.number)}</td><td>${esc(m.phone)}</td><td>${m.type==='office'?'ഭാരവാഹി':'അംഗം'} ${m.role?' / '+esc(m.role):''}</td><td>${esc(m.address)}</td><td class="no-print"><button class="action light" onclick="editMember('${m.id}')">തിരുത്തുക</button><button class="action danger" onclick="deleteMember('${m.id}')">നീക്കുക</button></td></tr>`).join('')||'<tr><td colspan="7">വിവരങ്ങളൊന്നുമില്ല</td></tr>'}
+function editMember(id){const m=db.members.find(x=>x.id===id);if(!m)return;$('editId').value=m.id;$('mName').value=m.name;$('mPhone').value=m.phone;$('mNo').value=m.number;$('mType').value=m.type;$('mRole').value=m.role;$('mAddress').value=m.address;window.scrollTo({top:0,behavior:'smooth'})}
+function deleteMember(id){if(!confirm('ഈ അംഗത്തെ നീക്കണോ? പഴയ പങ്കാളിത്ത/ഹാജർ രേഖകൾ നിലനിൽക്കും.'))return;db.members=db.members.filter(m=>m.id!==id);save()}
+function parseCSV(text){let rows=[],row=[],v='',q=false;for(let i=0;i<text.length;i++){let c=text[i];if(c==='"'&&q&&text[i+1]==='"'){v+='"';i++}else if(c==='"')q=!q;else if(c===','&&!q){row.push(v.trim());v=''}else if((c==='\n'||c==='\r')&&!q){if(c==='\r'&&text[i+1]==='\n')i++;row.push(v.trim());if(row.some(x=>x))rows.push(row);row=[];v=''}else v+=c}row.push(v.trim());if(row.some(x=>x))rows.push(row);return rows}
+async function importCSV(){const f=$('csvFile').files[0];if(!f){alert('ആദ്യം CSV ഫയൽ തിരഞ്ഞെടുക്കുക');return}const rows=parseCSV(await f.text());if(rows.length<2){alert('CSV-യിൽ അംഗങ്ങളുടെ വിവരങ്ങൾ കണ്ടെത്തിയില്ല');return}const headers=rows.shift().map(x=>x.toLowerCase().replace(/\s/g,''));const aliases=[['പേര്','name'],['മൊബൈൽ','mobile','phone'],['അംഗത്വനമ്പർ','അംഗത്വ നമ്പർ','number','memberno'],['വിഭാഗം','type','category'],['പദവി','role','designation'],['വിലാസം','address','unit']];const idx=aliases.map(a=>headers.findIndex(h=>a.map(x=>x.toLowerCase().replace(/\s/g,'')).includes(h)));let added=0;rows.forEach(r=>{const get=i=>i>=0?(r[i]||''):'';const name=get(idx[0]);if(!name)return;const raw=get(idx[3]).toLowerCase();db.members.push({id:uid(),name,phone:get(idx[1]),number:get(idx[2]),type:(raw.includes('ഭാര')||raw.includes('office'))?'office':'member',role:get(idx[4]),address:get(idx[5])});added++});save();$('importMsg').textContent=added+' അംഗങ്ങളെ ചേർത്തു.';$('csvFile').value=''}
+function downloadTemplate(){download('members_template.csv','\ufeffപേര്,മൊബൈൽ,അംഗത്വനമ്പർ,വിഭാഗം,പദവി,വിലാസം\nഅനിൽ,9876543210,001,അംഗം,,യൂണിറ്റ് 1\nസുമ,9876543211,002,ഭാരവാഹി,സെക്രട്ടറി,യൂണിറ്റ് 1')}
+$('partForm').addEventListener('submit',e=>{e.preventDefault();db.participations.push({id:uid(),event:$('pEvent').value.trim(),date:$('pDate').value,memberId:$('pMember').value,detail:$('pDetail').value.trim()});$('partForm').reset();save()});
+function renderParts(){const q=$('pSearch').value.toLowerCase(),d=$('pDateFilter').value;const a=db.participations.filter(x=>x.event.toLowerCase().includes(q)&&(!d||x.date===d)).slice().sort((x,y)=>y.date.localeCompare(x.date));$('partRows').innerHTML=a.map(x=>`<tr><td>${esc(x.date)}</td><td>${esc(x.event)}</td><td>${esc(memberName(x.memberId))}</td><td>${esc(x.detail)}</td><td class="no-print"><button class="action danger" onclick="delRecord('participations','${x.id}')">നീക്കുക</button></td></tr>`).join('')||'<tr><td colspan="5">രേഖകളില്ല</td></tr>'}
+$('meetingForm').addEventListener('submit',e=>{e.preventDefault();db.attendance.push({id:uid(),meeting:$('aMeeting').value.trim(),date:$('aDate').value,memberId:$('aMember').value,status:$('aStatus').value,note:$('aNote').value.trim()});$('meetingForm').reset();save()});
+function renderAttendance(){const q=$('aSearch').value.toLowerCase(),d=$('aDateFilter').value;const a=db.attendance.filter(x=>x.meeting.toLowerCase().includes(q)&&(!d||x.date===d)).slice().sort((x,y)=>y.date.localeCompare(x.date));$('attendanceRows').innerHTML=a.map(x=>`<tr><td>${esc(x.date)}</td><td>${esc(x.meeting)}</td><td>${esc(memberName(x.memberId))}</td><td>${statusText(x.status)}</td><td>${esc(x.note)}</td><td class="no-print"><button class="action danger" onclick="delRecord('attendance','${x.id}')">നീക്കുക</button></td></tr>`).join('')||'<tr><td colspan="6">രേഖകളില്ല</td></tr>'}
+function statusText(s){return s==='present'?'ഹാജർ':s==='absent'?'ഹാജരായില്ല':'അവധി'}
+function delRecord(k,id){if(confirm('ഈ രേഖ നീക്കണോ?')){db[k]=db[k].filter(x=>x.id!==id);save()}}
+
+/* ===== ബൾക്ക് ഹാജർ / പങ്കാളിത്തം ===== */
+function renderBulkTables(){
+  const sorted = db.members.slice().sort((a,b)=>a.name.localeCompare(b.name,'ml'));
+  $('bulkPartRows').innerHTML = sorted.map(m=>`
+    <tr>
+      <td><input type="checkbox" class="bulk-part-chk" value="${esc(m.id)}" checked></td>
+      <td>${esc(m.name)}</td><td>${esc(m.number)}</td>
+      <td>${m.type==='office'?'ഭാരവാഹി':'അംഗം'}</td>
+    </tr>`).join('') || '<tr><td colspan="4">അംഗങ്ങളില്ല</td></tr>';
+  $('bulkAttRows').innerHTML = sorted.map(m=>`
+    <tr>
+      <td><input type="checkbox" class="bulk-att-chk" value="${esc(m.id)}" checked></td>
+      <td>${esc(m.name)}</td><td>${esc(m.number)}</td>
+      <td>
+        <select class="bulk-att-status" data-id="${esc(m.id)}">
+          <option value="present">ഹാജർ</option>
+          <option value="absent">ഹാജരായില്ല</option>
+          <option value="leave">അവധി</option>
+        </select>
+      </td>
+    </tr>`).join('') || '<tr><td colspan="4">അംഗങ്ങളില്ല</td></tr>';
+  document.querySelectorAll('.bulk-att-status').forEach(s=>s.value=$('baDefaultStatus').value);
+}
+function bulkSelectAll(which, checked){
+  const cls = which==='part' ? '.bulk-part-chk' : '.bulk-att-chk';
+  document.querySelectorAll(cls).forEach(c=>c.checked=checked);
+}
+function saveBulkPart(){
+  const ev=$('bpEvent').value.trim(), date=$('bpDate').value, detail=$('bpDetail').value.trim();
+  if(!ev || !date){ alert('പരിപാടിയുടെ പേരും തീയതിയും നിർബന്ധമാണ്'); return; }
+  const ids=[...document.querySelectorAll('.bulk-part-chk:checked')].map(c=>c.value);
+  if(!ids.length){ alert('ഒരു അംഗത്തെയെങ്കിലും തിരഞ്ഞെടുക്കുക'); return; }
+  let added=0;
+  ids.forEach(id=>{
+    if(!db.participations.some(x=>x.event===ev && x.date===date && x.memberId===id)){
+      db.participations.push({id:uid(), event:ev, date, memberId:id, detail});
+      added++;
+    }
+  });
+  save();
+  $('bulkPartMsg').textContent = added+' പങ്കാളിത്ത രേഖകൾ ചേർത്തു. (ഡ്യൂപ്ലിക്കേറ്റുകൾ ഒഴിവാക്കി)';
+  $('bpEvent').value=''; $('bpDate').value=''; $('bpDetail').value='';
+}
+function saveBulkAtt(){
+  const meeting=$('baMeeting').value.trim(), date=$('baDate').value, defStatus=$('baDefaultStatus').value, note=$('baNote').value.trim();
+  if(!meeting || !date){ alert('യോഗത്തിന്റെ പേരും തീയതിയും നിർബന്ധമാണ്'); return; }
+  const checked=[...document.querySelectorAll('.bulk-att-chk:checked')].map(c=>c.value);
+  if(!checked.length){ alert('ഒരു അംഗത്തെയെങ്കിലും തിരഞ്ഞെടുക്കുക'); return; }
+  let added=0;
+  checked.forEach(id=>{
+    const sel=document.querySelector(`.bulk-att-status[data-id="${id}"]`);
+    const status=sel ? sel.value : defStatus;
+    if(!db.attendance.some(x=>x.meeting===meeting && x.date===date && x.memberId===id)){
+      db.attendance.push({id:uid(), meeting, date, memberId:id, status, note});
+      added++;
+    }
+  });
+  save();
+  $('bulkAttMsg').textContent = added+' ഹാജർ രേഖകൾ ചേർത്തു. (ഡ്യൂപ്ലിക്കേറ്റുകൾ ഒഴിവാക്കി)';
+  $('baMeeting').value=''; $('baDate').value=''; $('baNote').value='';
+}
+document.addEventListener('change', e=>{
+  if(e.target.id==='baDefaultStatus'){
+    document.querySelectorAll('.bulk-att-status').forEach(s=>s.value=e.target.value);
+  }
+});
+
+/* ===== റിപ്പോർട്ടുകൾ ===== */
+function toggleReportOptions(){
+  const t = $('reportType').value;
+  $('memberPickWrap').style.display = (t==='memberpart') ? 'grid' : 'none';
+  // അംഗം ഡ്രോപ്പ്ഡൗൺ നിറയ്ക്കുക
+  if(t==='memberpart'){
+    const old = $('reportMember').value;
+    $('reportMember').innerHTML = '<option value="">എല്ലാ അംഗങ്ങളും</option>' +
+      db.members.slice().sort((a,b)=>a.name.localeCompare(b.name,'ml'))
+        .map(m=>`<option value="${esc(m.id)}">${esc(m.name)}${m.type==='office'?' (ഭാരവാഹി)':''}</option>`).join('');
+    if(db.members.some(m=>m.id===old)) $('reportMember').value = old;
+  }
+}
+function inRange(x){return (!$('fromDate').value||x.date>=$('fromDate').value)&&(!$('toDate').value||x.date<=$('toDate').value)}
+function makeReport(){
+  const type=$('reportType').value, name=$('reportName').value.trim().toLowerCase();
+  let title='', rows=[], heads=[], html='';
+
+  if(type==='part'){
+    title='പരിപാടി പങ്കാളിത്ത റിപ്പോർട്ട്';
+    heads=['ക്രമം','തീയതി','പരിപാടി','അംഗം','വിശദാംശം'];
+    rows=db.participations.filter(x=>inRange(x)&&(!name||x.event.toLowerCase().includes(name)))
+      .sort((a,b)=>a.date.localeCompare(b.date))
+      .map((x,i)=>[i+1,x.date,x.event,memberName(x.memberId),x.detail]);
+  } else if(type==='attendance'){
+    title='യോഗ ഹാജർ റിപ്പോർട്ട്';
+    heads=['ക്രമം','തീയതി','യോഗം','അംഗം','ഹാജർ നില','കുറിപ്പ്'];
+    rows=db.attendance.filter(x=>inRange(x)&&(!name||x.meeting.toLowerCase().includes(name)))
+      .sort((a,b)=>a.date.localeCompare(b.date))
+      .map((x,i)=>[i+1,x.date,x.meeting,memberName(x.memberId),statusText(x.status),x.note]);
+  } else if(type==='members'){
+    title='അംഗങ്ങളുടെ പട്ടിക';
+    heads=['ക്രമം','പേര്','അംഗത്വ നമ്പർ','മൊബൈൽ','വിഭാഗം','പദവി','വിലാസം'];
+    rows=db.members.map((x,i)=>[i+1,x.name,x.number,x.phone,x.type==='office'?'ഭാരവാഹി':'അംഗം',x.role,x.address]);
+  } else if(type==='memberpart'){
+    title='അംഗം തിരിച്ചുള്ള പരിപാടി പങ്കാളിത്തം';
+    const picked = $('reportMember').value;
+    // തിരഞ്ഞെടുത്ത അംഗങ്ങൾ (അല്ലെങ്കിൽ എല്ലാവരും) + പേര് അനുസരിച്ച് ക്രമീകരിക്കുക
+    let members = db.members.slice().sort((a,b)=>a.name.localeCompare(b.name,'ml'));
+    if(picked) members = members.filter(m=>m.id===picked);
+    if(!members.length){
+      html = '<div class="card"><p>അംഗങ്ങളെ കണ്ടെത്തിയില്ല.</p></div>';
+      $('reportOutput').innerHTML = html; return;
+    }
+    let totalEvents = 0;
+    html = members.map(m=>{
+      // ഈ അംഗത്തിന്റെ പരിപാടികൾ (തീയതി പരിധി + പേര് ഫിൽട്ടർ ഉൾപ്പെടെ)
+      const recs = db.participations
+        .filter(x=>x.memberId===m.id && inRange(x) && (!name||x.event.toLowerCase().includes(name)))
+        .sort((a,b)=>a.date.localeCompare(b.date));
+      totalEvents += recs.length;
+      const list = recs.length
+        ? `<table><thead><tr><th>തീയതി</th><th>പരിപാടി</th><th>വിശദാംശം</th></tr></thead><tbody>` +
+          recs.map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.event)}</td><td>${esc(r.detail)}</td></tr>`).join('') +
+          `</tbody></table>`
+        : '<p class="small">പരിപാടി പങ്കാളിത്ത രേഖകളില്ല.</p>';
+      const typeTag = m.type==='office' ? 'ഭാരവാഹി' + (m.role?' / '+esc(m.role):'') : 'അംഗം';
+      return `<div class="member-summary">
+        <h3>${esc(m.name)}</h3>
+        <div><span class="tag ${m.type==='office'?'office':''}">${typeTag}</span>
+        ${m.number?`<span class="tag">അംഗത്വം: ${esc(m.number)}</span>`:''}
+        ${m.phone?`<span class="tag">📞 ${esc(m.phone)}</span>`:''}</div>
+        <div class="event-count">പങ്കെടുത്ത പരിപാടികൾ: <b>${recs.length}</b></div>
+        ${list}
+      </div>`;
+    }).join('');
+    html = `<div class="card" id="printArea">
+      <h2 class="report-title">${title}</h2>
+      <p>തയ്യാറാക്കിയ തീയതി: ${new Date().toLocaleDateString('en-GB')} • ആകെ അംഗങ്ങൾ: ${members.length} • ആകെ പങ്കാളിത്തങ്ങൾ: ${totalEvents}</p>
+      ${html}
+    </div>`;
+    $('reportOutput').innerHTML = html;
+    return;
+  }
+
+  const body = rows.length
+    ? rows.map(r=>'<tr>'+r.map(c=>`<td>${esc(c)}</td>`).join('')+'</tr>').join('')
+    : `<tr><td colspan="${heads.length}">റിപ്പോർട്ടിൽ രേഖകളില്ല</td></tr>`;
+  $('reportOutput').innerHTML = `<div class="card" id="printArea">
+    <h2 class="report-title">${title}</h2>
+    <p>തയ്യാറാക്കിയ തീയതി: ${new Date().toLocaleDateString('en-GB')}</p>
+    <div class="table-wrap"><table><thead><tr>${heads.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+    <tbody>${body}</tbody></table></div>
+    <p>ആകെ രേഖകൾ: ${rows.length}</p>
+  </div>`;
+}
+function printReport(){if(!$('reportOutput').innerHTML.trim()){makeReport()}document.querySelectorAll('.panel').forEach(p=>p.classList.remove('printing'));$('reports').classList.add('printing');window.print();$('reports').classList.remove('printing')}
+function download(name,content,type='text/csv;charset=utf-8'){const a=document.createElement('a'),u=URL.createObjectURL(new Blob([content],{type}));a.href=u;a.download=name;a.click();URL.revokeObjectURL(u)}
+function exportBackup(){download('member_attendance_backup.json',JSON.stringify(db,null,2),'application/json')}
+async function restoreBackup(){const f=$('backupFile').files[0];if(!f)return alert('ബാക്കപ്പ് ഫയൽ തിരഞ്ഞെടുക്കുക');if(!confirm('നിലവിലെ വിവരങ്ങൾ മാറ്റിസ്ഥാപിക്കണോ? ആദ്യം ബാക്കപ്പ് എടുത്തിട്ടുണ്ടെന്ന് ഉറപ്പാക്കുക.'))return;try{const d=JSON.parse(await f.text());if(!Array.isArray(d.members)||!Array.isArray(d.participations)||!Array.isArray(d.attendance))throw Error();db=d;save();alert('ബാക്കപ്പ് പുനഃസ്ഥാപിച്ചു')}catch(e){alert('ശരിയായ ബാക്കപ്പ് ഫയൽ അല്ല')}}
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));b.classList.add('active');$(b.dataset.tab).classList.add('active')}));
+load();refresh();toggleReportOptions();
+</script>
+</body></html>
